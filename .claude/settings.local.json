@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import sys; sys.path.insert\\(0, 'src'\\); from main import app; print\\('✅ API carregada com sucesso'\\); print\\(f'Routes: {len\\(app.routes\\)}'\\); print\\(f'Routers inclusos: {[r.path for r in app.routes if hasattr\\(r, \\\\\"path\\\\\"\\)][:5]}'\\)\")",
+      "Bash(python -c \"import sys; sys.path.insert\\(0, 'src'\\); from main import app; print\\('✅ API carregada com sucesso'\\); print\\(f'Versão: {app.version}'\\); print\\(f'Total de routes: {len\\(app.routes\\)}'\\)\")",
+      "Bash(python -m pytest tests/ -v --tb=short)"
+    ]
+  }
+}

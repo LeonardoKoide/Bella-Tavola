@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+httpx
+pytest
+scikit-learn
+joblib
+numpy
+pandas
+huggingface_hub
+autoflake
+black
