@@ -3,7 +3,18 @@
     "allow": [
       "Bash(python -c \"import sys; sys.path.insert\\(0, 'src'\\); from main import app; print\\('✅ API carregada com sucesso'\\); print\\(f'Routes: {len\\(app.routes\\)}'\\); print\\(f'Routers inclusos: {[r.path for r in app.routes if hasattr\\(r, \\\\\"path\\\\\"\\)][:5]}'\\)\")",
       "Bash(python -c \"import sys; sys.path.insert\\(0, 'src'\\); from main import app; print\\('✅ API carregada com sucesso'\\); print\\(f'Versão: {app.version}'\\); print\\(f'Total de routes: {len\\(app.routes\\)}'\\)\")",
-      "Bash(python -m pytest tests/ -v --tb=short)"
+      "Bash(python -m pytest tests/ -v --tb=short)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python -m pytest tests/ -m smoke -v)",
+      "Bash(python -m pytest tests/ -m integracao -v)",
+      "Bash(python -c \"from main import app; print\\('API loaded successfully'\\); print\\(f'Routes: {len\\(app.routes\\)}'\\)\")",
+      "Bash(python -m pytest tests/ --co -q)",
+      "Bash(python -m pytest tests/ -q)",
+      "Bash(awk '{print $NF}')",
+      "Bash(grep -v \"^$\")",
+      "Bash(python -m pytest tests/ -m smoke --co -q)",
+      "Bash(python -m pytest tests/ -m integracao --co -q)",
+      "Bash(gh pr *)"
     ]
   }
 }

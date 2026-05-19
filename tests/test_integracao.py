@@ -4,12 +4,7 @@ import pytest
 @pytest.mark.integracao
 def test_criar_prato_completo(client):
     """Teste de integração: criar prato com todos os campos"""
-    prato = {
-        "nome": "Ravioli de Ricota",
-        "categoria": "massa",
-        "preco": 58.0,
-        "disponivel": True
-    }
+    prato = {"nome": "Ravioli de Ricota", "categoria": "massa", "preco": 58.0, "disponivel": True}
     response = client.post("/pratos", json=prato)
     assert response.status_code == 201 or response.status_code == 200
     data = response.json()
@@ -41,11 +36,7 @@ def test_listar_pratos_com_filtro(client):
 @pytest.mark.integracao
 def test_fluxo_pedido_completo(client):
     """Teste de integração: criar pedido com prato existente"""
-    pedido = {
-        "prato_id": 1,
-        "quantidade": 2,
-        "observacao": "Sem cebola"
-    }
+    pedido = {"prato_id": 1, "quantidade": 2, "observacao": "Sem cebola"}
     response = client.post("/pedidos", json=pedido)
     assert response.status_code in [200, 201]
     data = response.json()
@@ -56,10 +47,7 @@ def test_fluxo_pedido_completo(client):
 @pytest.mark.integracao
 def test_pedido_prato_indisponivel(client):
     """Teste de integração: erro ao criar pedido com prato indisponível"""
-    pedido = {
-        "prato_id": 999,
-        "quantidade": 1
-    }
+    pedido = {"prato_id": 999, "quantidade": 1}
     response = client.post("/pedidos", json=pedido)
     assert response.status_code == 404
 
