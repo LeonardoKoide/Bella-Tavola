@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
-from routers.pratos import pratos
+from .pratos import pratos
 
 router = APIRouter()
 pedidos = []
