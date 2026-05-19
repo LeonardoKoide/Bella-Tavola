@@ -349,7 +349,7 @@ pytest tests/test_pratos.py -v
 # @title
 # tests/test_pratos.py
 from fastapi.testclient import TestClient
-from main import app   # ajuste se necessário
+from main import app  # ajuste se necessário
 
 client = TestClient(app)
 
@@ -389,6 +389,7 @@ def test_buscar_prato_existente_retorna_campos_esperados():
 def test_buscar_prato_inexistente_retorna_404():
     response = client.get("/pratos/9999")
     assert response.status_code == 404
+
 
 """## Exercício 3.4 — Testando criação e validação
 
@@ -442,12 +443,13 @@ Adicione ao `test_pratos.py` testes para:
 # @title
 # Adicionar ao tests/test_pratos.py
 
+
 def test_criar_prato_valido():
     novo_prato = {
-        "nome": "Funghi Trifolati Teste",   # nome único para evitar colisão
+        "nome": "Funghi Trifolati Teste",  # nome único para evitar colisão
         "categoria": "massa",
         "preco": 54.0,
-        "disponivel": True
+        "disponivel": True,
     }
     response = client.post("/pratos", json=novo_prato)
     assert response.status_code in [200, 201]
@@ -458,31 +460,19 @@ def test_criar_prato_valido():
 
 
 def test_criar_prato_com_preco_negativo_retorna_422():
-    prato_invalido = {
-        "nome": "Prato Inválido",
-        "categoria": "pizza",
-        "preco": -10.0
-    }
+    prato_invalido = {"nome": "Prato Inválido", "categoria": "pizza", "preco": -10.0}
     response = client.post("/pratos", json=prato_invalido)
     assert response.status_code == 422
 
 
 def test_criar_prato_com_nome_curto_retorna_422():
-    prato_invalido = {
-        "nome": "AB",   # menos de 3 caracteres
-        "categoria": "pizza",
-        "preco": 40.0
-    }
+    prato_invalido = {"nome": "AB", "categoria": "pizza", "preco": 40.0}  # menos de 3 caracteres
     response = client.post("/pratos", json=prato_invalido)
     assert response.status_code == 422
 
 
 def test_criar_prato_com_categoria_invalida_retorna_422():
-    prato_invalido = {
-        "nome": "Prato Exótico",
-        "categoria": "esoterico",
-        "preco": 40.0
-    }
+    prato_invalido = {"nome": "Prato Exótico", "categoria": "esoterico", "preco": 40.0}
     response = client.post("/pratos", json=prato_invalido)
     assert response.status_code == 422
 
@@ -490,14 +480,11 @@ def test_criar_prato_com_categoria_invalida_retorna_422():
 def test_prato_criado_aparece_na_listagem():
     # Nome único para não colidir com outros testes ou dados iniciais
     nome_unico = "Tagliatelle Teste XYZ-9871"
-    client.post("/pratos", json={
-        "nome": nome_unico,
-        "categoria": "massa",
-        "preco": 68.0
-    })
+    client.post("/pratos", json={"nome": nome_unico, "categoria": "massa", "preco": 68.0})
     response = client.get("/pratos")
     nomes = [p["nome"] for p in response.json()]
     assert nome_unico in nomes
+
 
 # Lembrete: esses testes ainda compartilham estado em memória.
 # O Bloco 4 mostrará como lidar com isso de forma mais adequada.
@@ -537,17 +524,13 @@ pytest tests/ -v
 # @title
 # tests/test_pedidos.py
 from fastapi.testclient import TestClient
-from main import app   # ajuste se necessário
+from main import app  # ajuste se necessário
 
 client = TestClient(app)
 
 
 def test_criar_pedido_com_prato_existente():
-    payload = {
-        "prato_id": 1,
-        "quantidade": 2,
-        "observacao": "sem cebola"
-    }
+    payload = {"prato_id": 1, "quantidade": 2, "observacao": "sem cebola"}
     response = client.post("/pedidos", json=payload)
     assert response.status_code in [200, 201]
     dados = response.json()
@@ -584,6 +567,7 @@ def test_criar_pedido_com_quantidade_zero_retorna_422():
     payload = {"prato_id": 1, "quantidade": 0}
     response = client.post("/pedidos", json=payload)
     assert response.status_code == 422
+
 
 """## Checklist do Bloco 3
 
@@ -797,7 +781,7 @@ pytest tests/ -v
 # tests/conftest.py
 import pytest
 from fastapi.testclient import TestClient
-from main import app   # ajuste se necessário
+from main import app  # ajuste se necessário
 
 
 @pytest.fixture
@@ -819,12 +803,7 @@ def client():
 @pytest.fixture
 def prato_valido():
     """Payload de prato válido para reutilizar nos testes."""
-    return {
-        "nome": "Prato de Fixture",
-        "categoria": "massa",
-        "preco": 45.0,
-        "disponivel": True
-    }
+    return {"nome": "Prato de Fixture", "categoria": "massa", "preco": 45.0, "disponivel": True}
 
 
 @pytest.fixture
@@ -835,7 +814,7 @@ def bebida_valida():
         "tipo": "agua",
         "preco": 8.0,
         "alcoolica": False,
-        "volume_ml": 500
+        "volume_ml": 500,
     }
 
 
@@ -903,6 +882,7 @@ def test_filtro_pizza_retorna_dois(client):
 
 """💡 Gabarito"""
 
+
 # @title
 # Teste A — problema: assume contagem absoluta de pratos
 # Robusto: verifica que a lista não está vazia e tem a estrutura esperada
@@ -945,6 +925,7 @@ def test_filtro_categoria_retorna_apenas_categoria_correta(client):
     pratos = response.json()
     for prato in pratos:
         assert prato["categoria"] == "pizza"
+
 
 """## Exercício 4.3 — Parametrização de casos de erro
 
@@ -996,19 +977,18 @@ import pytest
 import pytest
 
 
-@pytest.mark.parametrize("categoria_invalida", [
-    "esoterico",
-    "fastfood",
-    "japonesa",
-    "PIZZA",        # case-sensitive — não é igual a 'pizza'
-    "massa extra",  # espaço não permitido pelo pattern
-])
+@pytest.mark.parametrize(
+    "categoria_invalida",
+    [
+        "esoterico",
+        "fastfood",
+        "japonesa",
+        "PIZZA",  # case-sensitive — não é igual a 'pizza'
+        "massa extra",  # espaço não permitido pelo pattern
+    ],
+)
 def test_categoria_invalida_retorna_422(client, categoria_invalida):
-    prato = {
-        "nome": "Prato Teste",
-        "categoria": categoria_invalida,
-        "preco": 40.0
-    }
+    prato = {"nome": "Prato Teste", "categoria": categoria_invalida, "preco": 40.0}
     response = client.post("/pratos", json=prato)
     assert response.status_code == 422
 
@@ -1020,19 +1000,23 @@ def test_prato_inexistente_retorna_404(client, id_inexistente):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize("categoria_valida", [
-    "pizza",
-    "massa",
-    "sobremesa",
-    "entrada",
-    "salada",
-])
+@pytest.mark.parametrize(
+    "categoria_valida",
+    [
+        "pizza",
+        "massa",
+        "sobremesa",
+        "entrada",
+        "salada",
+    ],
+)
 def test_filtro_por_categoria_valida(client, categoria_valida):
     response = client.get(f"/pratos?categoria={categoria_valida}")
     assert response.status_code == 200
     pratos = response.json()
     for prato in pratos:
         assert prato["categoria"] == categoria_valida
+
 
 """## Exercício 4.4 — Marcadores e pipeline seletivo
 
@@ -1226,11 +1210,7 @@ def test_contrato_get_prato(client):
 
 
 def test_contrato_post_prato(client):
-    novo = {
-        "nome": "Prato Contrato Teste",
-        "categoria": "massa",
-        "preco": 45.0
-    }
+    novo = {"nome": "Prato Contrato Teste", "categoria": "massa", "preco": 45.0}
     response = client.post("/pratos", json=novo)
     assert response.status_code in [200, 201]
     prato = response.json()
@@ -1277,6 +1257,7 @@ def test_contrato_erro_422(client):
             assert isinstance(erro["loc"], list)
             assert isinstance(erro["msg"], str)
             assert len(erro["msg"]) > 0
+
 
 """## Checklist do Bloco 4
 

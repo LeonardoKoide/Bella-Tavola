@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.mark.smoke
 def test_contrato_get_prato(client):
     response = client.get("/pratos/1")

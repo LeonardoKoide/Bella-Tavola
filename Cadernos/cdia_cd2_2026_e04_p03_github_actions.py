@@ -336,8 +336,8 @@ import pytest
 import numpy as np
 
 
-REPO_ID = "seu-usuario/mlops-bella-tavola-v1"   # ajuste para seu repositório
-N_FEATURES = 5                                   # ajuste para o número de features do seu modelo
+REPO_ID = "seu-usuario/mlops-bella-tavola-v1"  # ajuste para seu repositório
+N_FEATURES = 5  # ajuste para o número de features do seu modelo
 
 
 @pytest.fixture(scope="module")
@@ -348,6 +348,7 @@ def modelo():
     importante para não sobrecarregar o pipeline com downloads repetidos.
     """
     from model_utils import load_model
+
     return load_model(REPO_ID)
 
 
@@ -358,7 +359,7 @@ def amostra_valida():
     Adapte os valores para as features do seu modelo.
     Prefira valores dentro das faixas vistas no treinamento.
     """
-    return np.array([[150.0, 14, 5.0, 1, 0]])   # ajuste para suas features
+    return np.array([[150.0, 14, 5.0, 1, 0]])  # ajuste para suas features
 
 
 @pytest.mark.integracao
@@ -388,8 +389,8 @@ def test_predict_retorna_array_com_formato_correto(modelo, amostra_valida):
 @pytest.mark.integracao
 def test_predict_proba_retorna_probabilidades_validas(modelo, amostra_valida):
     probas = modelo.predict_proba(amostra_valida)
-    assert probas.shape == (1, 2)               # duas classes
-    assert abs(probas[0].sum() - 1.0) < 1e-6   # soma = 1
+    assert probas.shape == (1, 2)  # duas classes
+    assert abs(probas[0].sum() - 1.0) < 1e-6  # soma = 1
     assert all(0 <= p <= 1 for p in probas[0])  # cada valor entre 0 e 1
 
 
@@ -469,7 +470,7 @@ PAYLOAD_VALIDO = {
     "hora_pedido": 20,
     "num_itens": 3,
     "historico_cancelamentos": 0,
-    "distancia_entrega": 2.5
+    "distancia_entrega": 2.5,
 }
 
 
@@ -515,22 +516,26 @@ def test_predict_label_e_string_nao_vazia(client):
 
 @pytest.mark.integracao
 def test_predict_sem_campo_obrigatorio_retorna_422(client):
-    payload_incompleto = {"valor_pedido": 120.0}   # faltam outros campos
+    payload_incompleto = {"valor_pedido": 120.0}  # faltam outros campos
     response = client.post("/ml/predict", json=payload_incompleto)
     assert response.status_code == 422
 
 
 @pytest.mark.integracao
-@pytest.mark.parametrize("campo,valor_invalido", [
-    ("hora_pedido", 25),       # hora fora de 0-23
-    ("hora_pedido", -1),       # hora negativa
-    ("num_itens", 0),          # quantidade inválida
-    ("valor_pedido", -50.0),   # valor negativo
-])
+@pytest.mark.parametrize(
+    "campo,valor_invalido",
+    [
+        ("hora_pedido", 25),  # hora fora de 0-23
+        ("hora_pedido", -1),  # hora negativa
+        ("num_itens", 0),  # quantidade inválida
+        ("valor_pedido", -50.0),  # valor negativo
+    ],
+)
 def test_predict_campo_invalido_retorna_422(client, campo, valor_invalido):
     payload = {**PAYLOAD_VALIDO, campo: valor_invalido}
     response = client.post("/ml/predict", json=payload)
     assert response.status_code == 422
+
 
 """## Exercício 5.4 — Adicionando cache ao pipeline
 
@@ -603,6 +608,7 @@ Escreva um teste que verifica que a probabilidade do caso "obviamente positivo" 
 # Adicionar ao tests/test_modelo.py
 # Adapte os valores para o domínio e features do seu modelo
 
+
 @pytest.mark.integracao
 def test_modelo_distingue_casos_extremos(client):
     """
@@ -621,7 +627,7 @@ def test_modelo_distingue_casos_extremos(client):
         "hora_pedido": 13,
         "num_itens": 2,
         "historico_cancelamentos": 0,
-        "distancia_entrega": 1.5
+        "distancia_entrega": 1.5,
     }
 
     caso_suspeito = {
@@ -629,7 +635,7 @@ def test_modelo_distingue_casos_extremos(client):
         "hora_pedido": 2,
         "num_itens": 12,
         "historico_cancelamentos": 4,
-        "distancia_entrega": 45.0
+        "distancia_entrega": 45.0,
     }
 
     resp_tipico = client.post("/ml/predict", json=caso_tipico)
@@ -656,6 +662,7 @@ def test_modelo_e_deterministico(client):
     resp_2 = client.post("/ml/predict", json=PAYLOAD_VALIDO)
     assert resp_1.json()["prediction"] == resp_2.json()["prediction"]
     assert resp_1.json()["probability"] == resp_2.json()["probability"]
+
 
 """## Checklist do Bloco 5
 

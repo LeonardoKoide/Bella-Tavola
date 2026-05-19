@@ -8,7 +8,7 @@ Original file is located at
 
 # FastAPI na Prática — Bella Tavola 🍝
 
-> **Como usar este caderno?**  
+> **Como usar este caderno?**
 > Este documento é seu guia de aprendizagem. Leia cada seção, estude o código de referência
 > e implemente os exercícios no seu ambiente preferido (Repl.it, GitHub Codespaces, ou localmente).
 > Teste suas rotas pelo Swagger UI em `http://localhost:8000/docs`.
@@ -28,7 +28,7 @@ Para rodar o servidor durante os exercícios:
 uvicorn main:app --reload
 ```
 
-A flag `--reload` faz o servidor reiniciar automaticamente a cada mudança no código.  
+A flag `--reload` faz o servidor reiniciar automaticamente a cada mudança no código.
 Você verá o resultado de cada rota em `http://localhost:8000/docs`.
 
 ## O Contexto
@@ -47,7 +47,7 @@ Ao final, você terá uma API real, estruturada como se fosse para produção.
 
 ### Conceitos-chave do Bloco 1
 
-**O que é uma rota?**  
+**O que é uma rota?**
 Uma rota é a combinação de um método HTTP (`GET`, `POST`, `PUT`, `DELETE`) com um caminho (`/pratos`, `/pratos/1`).
 No FastAPI, você define rotas com decorators:
 
@@ -64,7 +64,7 @@ No FastAPI, você define rotas com decorators:
 | Query parameter | `/pratos?categoria=massa` | Filtrar, paginar, ordenar |
 | Request body | `POST /pratos` com JSON | Enviar dados complexos |
 
-**Modelos Pydantic:**  
+**Modelos Pydantic:**
 São classes que descrevem a estrutura dos dados. O FastAPI os usa para validar automaticamente
 o que entra e o que sai da sua API.
 
@@ -92,17 +92,14 @@ O primeiro passo é criar o arquivo `main.py` com a instância do FastAPI e uma 
 from fastapi import FastAPI
 
 app = FastAPI(
-    title="Bella Tavola API",
-    description="API do restaurante Bella Tavola",
-    version="1.0.0"
+    title="Bella Tavola API", description="API do restaurante Bella Tavola", version="1.0.0"
 )
+
 
 @app.get("/")
 async def root():
-    return {
-        "restaurante": "Bella Tavola",
-        "mensagem": "Bem-vindo à nossa API"
-    }
+    return {"restaurante": "Bella Tavola", "mensagem": "Bem-vindo à nossa API"}
+
 
 """**Sua tarefa:**  
 Crie o arquivo `main.py` com a rota raiz. Adicione também os campos `chef`, `cidade` e `especialidade` à resposta.
@@ -125,10 +122,9 @@ Qualquer dicionário retornado de uma rota é automaticamente convertido em JSON
 from fastapi import FastAPI
 
 app = FastAPI(
-    title="Bella Tavola API",
-    description="API do restaurante Bella Tavola",
-    version="1.0.0"
+    title="Bella Tavola API", description="API do restaurante Bella Tavola", version="1.0.0"
 )
+
 
 @app.get("/")
 async def root():
@@ -137,8 +133,9 @@ async def root():
         "mensagem": "Bem-vindo à nossa API",
         "chef": "Marco Rossi",
         "cidade": "São Paulo",
-        "especialidade": "Massas artesanais"
+        "especialidade": "Massas artesanais",
     }
+
 
 """### Exercício 1.2 — O cardápio completo
 
@@ -155,9 +152,11 @@ pratos = [
     {"id": 2, "nome": "Carbonara", "categoria": "massa", "preco": 52.0},
 ]
 
+
 @app.get("/pratos")
 async def listar_pratos():
     return pratos
+
 
 """**Sua tarefa:**  
 Adicione ao `main.py` uma lista com pelo menos 6 pratos do Bella Tavola, cobrindo pelo menos 3 categorias
@@ -182,9 +181,11 @@ pratos = [
     {"id": 6, "nome": "Panna Cotta", "categoria": "sobremesa", "preco": 24.0},
 ]
 
+
 @app.get("/pratos")
 async def listar_pratos():
     return pratos
+
 
 """### Exercício 1.3 — Buscando um prato específico
 
@@ -196,12 +197,14 @@ que receba o ID daquele prato.
 **Referência:**
 """
 
+
 @app.get("/pratos/{prato_id}")
 async def buscar_prato(prato_id: int):
     for prato in pratos:
         if prato["id"] == prato_id:
             return prato
     return {"mensagem": "Prato não encontrado"}
+
 
 """**Sua tarefa:**  
 Adicione a rota `GET /pratos/{prato_id}`. Teste com IDs que existem e com IDs que não existem (ex: 99).
@@ -219,12 +222,14 @@ Por que isso é um problema para quem consome a API?
 
 """
 
+
 @app.get("/pratos/{prato_id}")
 async def buscar_prato(prato_id: int):
     for prato in pratos:
         if prato["id"] == prato_id:
             return prato
     return {"mensagem": "Prato não encontrado"}
+
 
 # Problema: retornar status 200 quando o recurso não existe
 # engana quem consome a API. Um cliente que verifica apenas
@@ -243,11 +248,13 @@ Query parameters são a forma certa de implementar filtros.
 
 from typing import Optional
 
+
 @app.get("/pratos")
 async def listar_pratos(categoria: Optional[str] = None):
     if categoria:
         return [p for p in pratos if p["categoria"] == categoria]
     return pratos
+
 
 """**Sua tarefa:**  
 Modifique a rota `GET /pratos` para aceitar dois query parameters opcionais:
@@ -270,11 +277,9 @@ Teste os seguintes casos no Swagger:
 
 from typing import Optional
 
+
 @app.get("/pratos")
-async def listar_pratos(
-    categoria: Optional[str] = None,
-    preco_maximo: Optional[float] = None
-):
+async def listar_pratos(categoria: Optional[str] = None, preco_maximo: Optional[float] = None):
     resultado = pratos
 
     if categoria:
@@ -284,6 +289,7 @@ async def listar_pratos(
         resultado = [p for p in resultado if p["preco"] <= preco_maximo]
 
     return resultado
+
 
 """### Exercício 1.5 — Path e query juntos
 
@@ -295,6 +301,7 @@ A rota recebe o ID do prato (path) e um flag de filtro (query).
 **Referência:**
 """
 
+
 @app.get("/pratos/{prato_id}/detalhes")
 async def detalhes_prato(prato_id: int, incluir_ingredientes: bool = False):
     for prato in pratos:
@@ -303,6 +310,7 @@ async def detalhes_prato(prato_id: int, incluir_ingredientes: bool = False):
                 return {**prato, "ingredientes": ["...lista..."]}
             return prato
     return {"mensagem": "Prato não encontrado"}
+
 
 """**Sua tarefa:**  
 Crie a rota `GET /pratos/{prato_id}` com um query parameter opcional `formato`
@@ -324,11 +332,18 @@ e um query parameter `apenas_disponiveis: bool = False` na rota `GET /pratos`.
 pratos = [
     {"id": 1, "nome": "Margherita", "categoria": "pizza", "preco": 45.0, "disponivel": True},
     {"id": 2, "nome": "Carbonara", "categoria": "massa", "preco": 52.0, "disponivel": True},
-    {"id": 3, "nome": "Lasanha Bolonhesa", "categoria": "massa", "preco": 58.0, "disponivel": False},
+    {
+        "id": 3,
+        "nome": "Lasanha Bolonhesa",
+        "categoria": "massa",
+        "preco": 58.0,
+        "disponivel": False,
+    },
     {"id": 4, "nome": "Tiramisù", "categoria": "sobremesa", "preco": 28.0, "disponivel": True},
     {"id": 5, "nome": "Quattro Stagioni", "categoria": "pizza", "preco": 49.0, "disponivel": True},
     {"id": 6, "nome": "Panna Cotta", "categoria": "sobremesa", "preco": 24.0, "disponivel": True},
 ]
+
 
 @app.get("/pratos/{prato_id}")
 async def buscar_prato(prato_id: int, formato: str = "completo"):
@@ -339,11 +354,12 @@ async def buscar_prato(prato_id: int, formato: str = "completo"):
             return prato
     return {"mensagem": "Prato não encontrado"}
 
+
 @app.get("/pratos")
 async def listar_pratos(
     categoria: Optional[str] = None,
     preco_maximo: Optional[float] = None,
-    apenas_disponiveis: bool = False
+    apenas_disponiveis: bool = False,
 ):
     resultado = pratos
     if categoria:
@@ -353,6 +369,7 @@ async def listar_pratos(
     if apenas_disponiveis:
         resultado = [p for p in resultado if p["disponivel"]]
     return resultado
+
 
 """### Exercício 1.6 — Cadastrando um prato
 
@@ -366,11 +383,13 @@ Para isso, usamos `POST` com um body JSON estruturado por um modelo Pydantic.
 
 from pydantic import BaseModel
 
+
 class PratoInput(BaseModel):
     nome: str
     categoria: str
     preco: float
     disponivel: bool = True  # valor padrão
+
 
 @app.post("/pratos")
 async def criar_prato(prato: PratoInput):
@@ -378,6 +397,7 @@ async def criar_prato(prato: PratoInput):
     novo_prato = {"id": novo_id, **prato.model_dump()}
     pratos.append(novo_prato)
     return novo_prato
+
 
 """**O que observar:** `prato.model_dump()` converte o modelo Pydantic em dicionário Python.
 O `**` desempacota esse dicionário dentro de outro — o mesmo que escrever cada campo manualmente, mas mais limpo.
@@ -401,6 +421,7 @@ Teste pelo Swagger: cadastre um novo prato e depois verifique se ele aparece no 
 from pydantic import BaseModel
 from typing import Optional
 
+
 class PratoInput(BaseModel):
     nome: str
     categoria: str
@@ -408,12 +429,14 @@ class PratoInput(BaseModel):
     descricao: Optional[str] = None
     disponivel: bool = True
 
+
 @app.post("/pratos")
 async def criar_prato(prato: PratoInput):
     novo_id = max(p["id"] for p in pratos) + 1
     novo_prato = {"id": novo_id, **prato.model_dump()}
     pratos.append(novo_prato)
     return novo_prato
+
 
 # Os dados são perdidos ao reiniciar porque estão em memória RAM.
 # Uma variável Python só existe enquanto o processo está rodando.
@@ -430,10 +453,12 @@ Para isso, modelos separados de entrada e saída são a solução correta.
 **Referência:**
 """
 
+
 class PratoInput(BaseModel):
     nome: str
     categoria: str
     preco: float
+
 
 class PratoOutput(BaseModel):
     id: int
@@ -442,17 +467,16 @@ class PratoOutput(BaseModel):
     preco: float
     criado_em: str  # campo gerado pelo servidor, não enviado pelo cliente
 
+
 @app.post("/pratos", response_model=PratoOutput)
 async def criar_prato(prato: PratoInput):
     from datetime import datetime
+
     novo_id = max(p["id"] for p in pratos) + 1
-    novo_prato = {
-        "id": novo_id,
-        "criado_em": datetime.now().isoformat(),
-        **prato.model_dump()
-    }
+    novo_prato = {"id": novo_id, "criado_em": datetime.now().isoformat(), **prato.model_dump()}
     pratos.append(novo_prato)
     return novo_prato
+
 
 """**O que observar:** O `response_model=PratoOutput` faz duas coisas: documenta no Swagger
 qual é o formato da resposta, e garante que campos não declarados no output não sejam retornados
@@ -476,12 +500,14 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 
+
 class PratoInput(BaseModel):
     nome: str
     categoria: str
     preco: float
     descricao: Optional[str] = None
     disponivel: bool = True
+
 
 class PratoOutput(BaseModel):
     id: int
@@ -492,16 +518,14 @@ class PratoOutput(BaseModel):
     disponivel: bool
     criado_em: str
 
+
 @app.post("/pratos", response_model=PratoOutput)
 async def criar_prato(prato: PratoInput):
     novo_id = max(p["id"] for p in pratos) + 1
-    novo_prato = {
-        "id": novo_id,
-        "criado_em": datetime.now().isoformat(),
-        **prato.model_dump()
-    }
+    novo_prato = {"id": novo_id, "criado_em": datetime.now().isoformat(), **prato.model_dump()}
     pratos.append(novo_prato)
     return novo_prato
+
 
 """### Exercício 1.8 — Desafio: as bebidas 🍷
 
@@ -540,12 +564,53 @@ from typing import Optional
 from pydantic import BaseModel
 
 bebidas = [
-    {"id": 1, "nome": "Água Mineral", "tipo": "agua", "preco": 8.0, "alcoolica": False, "volume_ml": 500, "criado_em": "2024-01-01T00:00:00"},
-    {"id": 2, "nome": "Chianti Classico", "tipo": "vinho", "preco": 120.0, "alcoolica": True, "volume_ml": 750, "criado_em": "2024-01-01T00:00:00"},
-    {"id": 3, "nome": "San Pellegrino", "tipo": "agua", "preco": 15.0, "alcoolica": False, "volume_ml": 750, "criado_em": "2024-01-01T00:00:00"},
-    {"id": 4, "nome": "Suco de Laranja", "tipo": "suco", "preco": 18.0, "alcoolica": False, "volume_ml": 300, "criado_em": "2024-01-01T00:00:00"},
-    {"id": 5, "nome": "Prosecco", "tipo": "vinho", "preco": 95.0, "alcoolica": True, "volume_ml": 750, "criado_em": "2024-01-01T00:00:00"},
+    {
+        "id": 1,
+        "nome": "Água Mineral",
+        "tipo": "agua",
+        "preco": 8.0,
+        "alcoolica": False,
+        "volume_ml": 500,
+        "criado_em": "2024-01-01T00:00:00",
+    },
+    {
+        "id": 2,
+        "nome": "Chianti Classico",
+        "tipo": "vinho",
+        "preco": 120.0,
+        "alcoolica": True,
+        "volume_ml": 750,
+        "criado_em": "2024-01-01T00:00:00",
+    },
+    {
+        "id": 3,
+        "nome": "San Pellegrino",
+        "tipo": "agua",
+        "preco": 15.0,
+        "alcoolica": False,
+        "volume_ml": 750,
+        "criado_em": "2024-01-01T00:00:00",
+    },
+    {
+        "id": 4,
+        "nome": "Suco de Laranja",
+        "tipo": "suco",
+        "preco": 18.0,
+        "alcoolica": False,
+        "volume_ml": 300,
+        "criado_em": "2024-01-01T00:00:00",
+    },
+    {
+        "id": 5,
+        "nome": "Prosecco",
+        "tipo": "vinho",
+        "preco": 95.0,
+        "alcoolica": True,
+        "volume_ml": 750,
+        "criado_em": "2024-01-01T00:00:00",
+    },
 ]
+
 
 class BebidaInput(BaseModel):
     nome: str
@@ -553,6 +618,7 @@ class BebidaInput(BaseModel):
     preco: float
     alcoolica: bool
     volume_ml: int
+
 
 class BebidaOutput(BaseModel):
     id: int
@@ -563,17 +629,16 @@ class BebidaOutput(BaseModel):
     volume_ml: int
     criado_em: str
 
+
 @app.get("/bebidas")
-async def listar_bebidas(
-    tipo: Optional[str] = None,
-    alcoolica: Optional[bool] = None
-):
+async def listar_bebidas(tipo: Optional[str] = None, alcoolica: Optional[bool] = None):
     resultado = bebidas
     if tipo:
         resultado = [b for b in resultado if b["tipo"] == tipo]
     if alcoolica is not None:
         resultado = [b for b in resultado if b["alcoolica"] == alcoolica]
     return resultado
+
 
 @app.get("/bebidas/{bebida_id}")
 async def buscar_bebida(bebida_id: int):
@@ -582,16 +647,14 @@ async def buscar_bebida(bebida_id: int):
             return bebida
     return {"mensagem": "Bebida não encontrada"}
 
+
 @app.post("/bebidas", response_model=BebidaOutput)
 async def criar_bebida(bebida: BebidaInput):
     novo_id = max(b["id"] for b in bebidas) + 1
-    nova_bebida = {
-        "id": novo_id,
-        "criado_em": datetime.now().isoformat(),
-        **bebida.model_dump()
-    }
+    nova_bebida = {"id": novo_id, "criado_em": datetime.now().isoformat(), **bebida.model_dump()}
     bebidas.append(nova_bebida)
     return nova_bebida
+
 
 """## BLOCO 2
 
@@ -718,15 +781,14 @@ quando um prato não existe.
 
 from fastapi import FastAPI, HTTPException
 
+
 @app.get("/pratos/{prato_id}")
 async def buscar_prato(prato_id: int):
     for prato in pratos:
         if prato["id"] == prato_id:
             return prato
-    raise HTTPException(
-        status_code=404,
-        detail=f"Prato com id {prato_id} não encontrado"
-    )
+    raise HTTPException(status_code=404, detail=f"Prato com id {prato_id} não encontrado")
+
 
 """**Sua tarefa:**  
 Atualize todas as rotas do Bloco 1 que retornam `{"mensagem": "... não encontrado"}`
@@ -746,6 +808,7 @@ Teste no Swagger e confirme que o status retornado mudou para 404.
 
 from fastapi import FastAPI, HTTPException
 
+
 @app.get("/pratos/{prato_id}")
 async def buscar_prato(prato_id: int, formato: str = "completo"):
     for prato in pratos:
@@ -753,20 +816,16 @@ async def buscar_prato(prato_id: int, formato: str = "completo"):
             if formato == "resumido":
                 return {"nome": prato["nome"], "preco": prato["preco"]}
             return prato
-    raise HTTPException(
-        status_code=404,
-        detail=f"Prato com id {prato_id} não encontrado"
-    )
+    raise HTTPException(status_code=404, detail=f"Prato com id {prato_id} não encontrado")
+
 
 @app.get("/bebidas/{bebida_id}")
 async def buscar_bebida(bebida_id: int):
     for bebida in bebidas:
         if bebida["id"] == bebida_id:
             return bebida
-    raise HTTPException(
-        status_code=404,
-        detail=f"Bebida com id {bebida_id} não encontrada"
-    )
+    raise HTTPException(status_code=404, detail=f"Bebida com id {bebida_id} não encontrada")
+
 
 # raise é usado porque HTTPException é uma exceção Python.
 # O raise interrompe imediatamente a execução da função
@@ -786,12 +845,14 @@ O lugar certo para barrar esses dados é no modelo Pydantic.
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class PratoInput(BaseModel):
     nome: str = Field(min_length=3, max_length=100, description="Nome do prato")
     categoria: str = Field(description="Categoria do prato")
     preco: float = Field(gt=0, description="Preço em reais, deve ser positivo")
     descricao: Optional[str] = Field(default=None, max_length=500)
     disponivel: bool = True
+
 
 """**Os principais constraints do Field:**
 
@@ -827,6 +888,7 @@ Teste enviando dados inválidos e observe a estrutura do erro 422 retornado.
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class PratoInput(BaseModel):
     nome: str = Field(min_length=3, max_length=100)
     categoria: str = Field(pattern="^(pizza|massa|sobremesa|entrada|salada)$")
@@ -834,12 +896,14 @@ class PratoInput(BaseModel):
     descricao: Optional[str] = Field(default=None, max_length=500)
     disponivel: bool = True
 
+
 class BebidaInput(BaseModel):
     nome: str = Field(min_length=3, max_length=100)
     tipo: str = Field(pattern="^(vinho|agua|refrigerante|suco|cerveja)$")
     preco: float = Field(gt=0)
     alcoolica: bool
     volume_ml: int = Field(ge=50, le=2000)
+
 
 """### Exercício 2.4 — Regras de negócio com validadores
 
@@ -854,6 +918,7 @@ Para isso, o Pydantic oferece validadores customizados.
 
 from pydantic import BaseModel, Field, field_validator
 
+
 class PratoInput(BaseModel):
     nome: str = Field(min_length=3)
     preco: float = Field(gt=0)
@@ -865,6 +930,7 @@ class PratoInput(BaseModel):
         if "preco" in info.data and v >= info.data["preco"]:
             raise ValueError("Preço promocional deve ser menor que o preço original")
         return v
+
 
 """**Sua tarefa:**  
 Adicione um campo opcional `preco_promocional: Optional[float] = None` ao `PratoInput`.
@@ -885,6 +951,7 @@ Teste com valores que violam cada uma das regras.
 
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
+
 
 class PratoInput(BaseModel):
     nome: str = Field(min_length=3, max_length=100)
@@ -913,6 +980,7 @@ class PratoInput(BaseModel):
 
         return v
 
+
 """### Exercício 2.5 — Múltiplos erros em uma rota
 
 **Conceito:** Lógica de negócio com múltiplos pontos de falha, status codes distintos.
@@ -922,6 +990,7 @@ Cada razão merece seu próprio status code e mensagem.
 
 **Referência:**
 """
+
 
 @app.post("/pratos/{prato_id}/aplicar_desconto")
 async def aplicar_desconto(prato_id: int, percentual: float):
@@ -933,19 +1002,18 @@ async def aplicar_desconto(prato_id: int, percentual: float):
     # Erro 400: dado válido estruturalmente, mas inválido para o negócio
     if percentual <= 0 or percentual > 50:
         raise HTTPException(
-            status_code=400,
-            detail="Percentual de desconto deve estar entre 1% e 50%"
+            status_code=400, detail="Percentual de desconto deve estar entre 1% e 50%"
         )
 
     # Erro 400: estado atual impede a operação
     if not prato["disponivel"]:
         raise HTTPException(
-            status_code=400,
-            detail="Não é possível aplicar desconto em prato indisponível"
+            status_code=400, detail="Não é possível aplicar desconto em prato indisponível"
         )
 
     prato["preco"] = prato["preco"] * (1 - percentual / 100)
     return prato
+
 
 """**Sua tarefa:**  
 Crie a rota `PUT /pratos/{prato_id}/disponibilidade` que altera a disponibilidade de um prato.
@@ -971,8 +1039,10 @@ Se tudo estiver ok, retorne o pedido com o valor total calculado.
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class DisponibilidadeInput(BaseModel):
     disponivel: bool
+
 
 @app.put("/pratos/{prato_id}/disponibilidade")
 async def alterar_disponibilidade(prato_id: int, body: DisponibilidadeInput):
@@ -985,10 +1055,12 @@ async def alterar_disponibilidade(prato_id: int, body: DisponibilidadeInput):
 
 pedidos = []
 
+
 class PedidoInput(BaseModel):
     prato_id: int
     quantidade: int = Field(ge=1)
     observacao: Optional[str] = None
+
 
 class PedidoOutput(BaseModel):
     id: int
@@ -997,6 +1069,7 @@ class PedidoOutput(BaseModel):
     quantidade: int
     valor_total: float
     observacao: Optional[str]
+
 
 @app.post("/pedidos", response_model=PedidoOutput)
 async def criar_pedido(pedido: PedidoInput):
@@ -1007,8 +1080,7 @@ async def criar_pedido(pedido: PedidoInput):
 
     if not prato["disponivel"]:
         raise HTTPException(
-            status_code=400,
-            detail=f"O prato '{prato['nome']}' não está disponível no momento"
+            status_code=400, detail=f"O prato '{prato['nome']}' não está disponível no momento"
         )
 
     novo_id = len(pedidos) + 1
@@ -1018,10 +1090,11 @@ async def criar_pedido(pedido: PedidoInput):
         "nome_prato": prato["nome"],
         "quantidade": pedido.quantidade,
         "valor_total": prato["preco"] * pedido.quantidade,
-        "observacao": pedido.observacao
+        "observacao": pedido.observacao,
     }
     pedidos.append(novo_pedido)
     return novo_pedido
+
 
 """### Exercício 2.6 — Exception handler global
 
@@ -1037,27 +1110,22 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=422,
-        content={
-            "erro": "Dados inválidos",
-            "detalhes": exc.errors(),
-            "path": str(request.url)
-        }
+        content={"erro": "Dados inválidos", "detalhes": exc.errors(), "path": str(request.url)},
     )
+
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "erro": exc.detail,
-            "status": exc.status_code,
-            "path": str(request.url)
-        }
+        content={"erro": exc.detail, "status": exc.status_code, "path": str(request.url)},
     )
+
 
 """**Sua tarefa:**  
 Adicione os dois exception handlers ao seu `main.py`.
@@ -1079,6 +1147,7 @@ from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
@@ -1088,14 +1157,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "status": 422,
             "path": str(request.url),
             "detalhes": [
-                {
-                    "campo": " -> ".join(str(loc) for loc in e["loc"]),
-                    "mensagem": e["msg"]
-                }
+                {"campo": " -> ".join(str(loc) for loc in e["loc"]), "mensagem": e["msg"]}
                 for e in exc.errors()
-            ]
-        }
+            ],
+        },
     )
+
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
@@ -1105,9 +1172,10 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             "erro": exc.detail,
             "status": exc.status_code,
             "path": str(request.url),
-            "detalhes": []
-        }
+            "detalhes": [],
+        },
     )
+
 
 """</details>
 
@@ -1132,17 +1200,20 @@ reservas = [
     {"id": 2, "mesa": 3, "nome": "Costa", "pessoas": 2, "ativa": False},
 ]
 
+
 class ReservaInput(BaseModel):
     mesa: int
     nome: str
     pessoas: int
+
 
 @app.get("/reservas/{reserva_id}")
 async def buscar_reserva(reserva_id: int):
     for r in reservas:
         if r["id"] == reserva_id:
             return r
-    return {"erro": "não encontrada"}          # problema?
+    return {"erro": "não encontrada"}  # problema?
+
 
 @app.post("/reservas")
 async def criar_reserva(reserva: ReservaInput):
@@ -1150,6 +1221,7 @@ async def criar_reserva(reserva: ReservaInput):
     nova = {"id": len(reservas) + 1, **reserva.model_dump(), "ativa": True}
     reservas.append(nova)
     return nova
+
 
 @app.delete("/reservas/{reserva_id}")
 async def cancelar_reserva(reserva_id: int):
@@ -1159,11 +1231,13 @@ async def cancelar_reserva(reserva_id: int):
             return {"mensagem": "cancelada"}
     # problema?
 
+
 @app.get("/reservas")
 async def listar_reservas(apenas_ativas: bool = False):
     if apenas_ativas:
         return [r for r in reservas if r["ativa"] == "true"]  # problema?
     return reservas
+
 
 # ✏️ Liste aqui os 5 problemas que você identificou:
 
@@ -1194,10 +1268,12 @@ reservas = [
     {"id": 2, "mesa": 3, "nome": "Costa", "pessoas": 2, "ativa": False},
 ]
 
+
 class ReservaInput(BaseModel):
-    mesa: int = Field(ge=1, le=20)           # corrige problema 2
+    mesa: int = Field(ge=1, le=20)  # corrige problema 2
     nome: str = Field(min_length=2, max_length=100)
     pessoas: int = Field(ge=1, le=20)
+
 
 @app.get("/reservas/{reserva_id}")
 async def buscar_reserva(reserva_id: int):
@@ -1206,20 +1282,18 @@ async def buscar_reserva(reserva_id: int):
             return r
     raise HTTPException(status_code=404, detail="Reserva não encontrada")  # corrige problema 1
 
+
 @app.post("/reservas")
 async def criar_reserva(reserva: ReservaInput):
-    mesa_ocupada = any(                        # corrige problema 5
-        r["mesa"] == reserva.mesa and r["ativa"]
-        for r in reservas
+    mesa_ocupada = any(  # corrige problema 5
+        r["mesa"] == reserva.mesa and r["ativa"] for r in reservas
     )
     if mesa_ocupada:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Mesa {reserva.mesa} já está reservada"
-        )
+        raise HTTPException(status_code=400, detail=f"Mesa {reserva.mesa} já está reservada")
     nova = {"id": len(reservas) + 1, **reserva.model_dump(), "ativa": True}
     reservas.append(nova)
     return nova
+
 
 @app.delete("/reservas/{reserva_id}")
 async def cancelar_reserva(reserva_id: int):
@@ -1229,11 +1303,13 @@ async def cancelar_reserva(reserva_id: int):
             return {"mensagem": "Reserva cancelada com sucesso"}
     raise HTTPException(status_code=404, detail="Reserva não encontrada")  # corrige problema 3
 
+
 @app.get("/reservas")
 async def listar_reservas(apenas_ativas: bool = False):
     if apenas_ativas:
         return [r for r in reservas if r["ativa"]]  # corrige problema 4
     return reservas
+
 
 """## BLOCO 3
 
@@ -1364,13 +1440,14 @@ router = APIRouter()
 
 pratos = [...]  # a lista de pratos fica aqui
 
+
 @router.get("/")
-async def listar_pratos(categoria: Optional[str] = None):
-    ...
+async def listar_pratos(categoria: Optional[str] = None): ...
+
 
 @router.get("/{prato_id}")
-async def buscar_prato(prato_id: int):
-    ...
+async def buscar_prato(prato_id: int): ...
+
 
 # main.py
 from fastapi import FastAPI
@@ -1378,11 +1455,7 @@ from routers import pratos
 
 app = FastAPI(title="Bella Tavola API")
 
-app.include_router(
-    pratos.router,
-    prefix="/pratos",
-    tags=["Pratos"]
-)
+app.include_router(pratos.router, prefix="/pratos", tags=["Pratos"])
 
 """**Sua tarefa:**  
 Crie a pasta `routers/` e o arquivo `routers/pratos.py`.
@@ -1417,15 +1490,31 @@ from datetime import datetime
 router = APIRouter()
 
 pratos = [
-    {"id": 1, "nome": "Margherita", "categoria": "pizza", "preco": 45.0, "disponivel": True, "criado_em": "2024-01-01T00:00:00"},
-    {"id": 2, "nome": "Carbonara", "categoria": "massa", "preco": 52.0, "disponivel": True, "criado_em": "2024-01-01T00:00:00"},
+    {
+        "id": 1,
+        "nome": "Margherita",
+        "categoria": "pizza",
+        "preco": 45.0,
+        "disponivel": True,
+        "criado_em": "2024-01-01T00:00:00",
+    },
+    {
+        "id": 2,
+        "nome": "Carbonara",
+        "categoria": "massa",
+        "preco": 52.0,
+        "disponivel": True,
+        "criado_em": "2024-01-01T00:00:00",
+    },
 ]
+
 
 class PratoInput(BaseModel):
     nome: str = Field(min_length=3, max_length=100)
     categoria: str = Field(pattern="^(pizza|massa|sobremesa|entrada|salada)$")
     preco: float = Field(gt=0)
     disponivel: bool = True
+
 
 class PratoOutput(BaseModel):
     id: int
@@ -1434,6 +1523,7 @@ class PratoOutput(BaseModel):
     preco: float
     disponivel: bool
     criado_em: str
+
 
 @router.get("/")
 async def listar_pratos(categoria: Optional[str] = None, apenas_disponiveis: bool = False):
@@ -1444,12 +1534,14 @@ async def listar_pratos(categoria: Optional[str] = None, apenas_disponiveis: boo
         resultado = [p for p in resultado if p["disponivel"]]
     return resultado
 
+
 @router.get("/{prato_id}")
 async def buscar_prato(prato_id: int):
     for prato in pratos:
         if prato["id"] == prato_id:
             return prato
     raise HTTPException(status_code=404, detail="Prato não encontrado")
+
 
 @router.post("/", response_model=PratoOutput)
 async def criar_prato(prato: PratoInput):
@@ -1505,10 +1597,9 @@ from fastapi.exceptions import RequestValidationError
 from routers import pratos, bebidas, pedidos, reservas
 
 app = FastAPI(
-    title="Bella Tavola API",
-    description="API do restaurante Bella Tavola",
-    version="1.0.0"
+    title="Bella Tavola API", description="API do restaurante Bella Tavola", version="1.0.0"
 )
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -1518,25 +1609,37 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "erro": "Dados de entrada inválidos",
             "status": 422,
             "path": str(request.url),
-            "detalhes": [{"campo": " -> ".join(str(loc) for loc in e["loc"]), "mensagem": e["msg"]} for e in exc.errors()]
-        }
+            "detalhes": [
+                {"campo": " -> ".join(str(loc) for loc in e["loc"]), "mensagem": e["msg"]}
+                for e in exc.errors()
+            ],
+        },
     )
+
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
-        content={"erro": exc.detail, "status": exc.status_code, "path": str(request.url), "detalhes": []}
+        content={
+            "erro": exc.detail,
+            "status": exc.status_code,
+            "path": str(request.url),
+            "detalhes": [],
+        },
     )
 
-app.include_router(pratos.router,   prefix="/pratos",   tags=["Pratos"])
-app.include_router(bebidas.router,  prefix="/bebidas",  tags=["Bebidas"])
-app.include_router(pedidos.router,  prefix="/pedidos",  tags=["Pedidos"])
+
+app.include_router(pratos.router, prefix="/pratos", tags=["Pratos"])
+app.include_router(bebidas.router, prefix="/bebidas", tags=["Bebidas"])
+app.include_router(pedidos.router, prefix="/pedidos", tags=["Pedidos"])
 app.include_router(reservas.router, prefix="/reservas", tags=["Reservas"])
+
 
 @app.get("/", tags=["Geral"])
 async def root():
     return {"restaurante": "Bella Tavola", "versao": "1.0.0"}
+
 
 """### Exercício 3.4 — Separando os modelos
 
@@ -1563,11 +1666,13 @@ models/
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class PratoInput(BaseModel):
     nome: str = Field(min_length=3, max_length=100)
     categoria: str = Field(pattern="^(pizza|massa|sobremesa|entrada|salada)$")
     preco: float = Field(gt=0)
     disponivel: bool = True
+
 
 class PratoOutput(BaseModel):
     id: int
@@ -1576,6 +1681,7 @@ class PratoOutput(BaseModel):
     preco: float
     disponivel: bool
     criado_em: str
+
 
 # routers/pratos.py — imports atualizados
 from fastapi import APIRouter, HTTPException
@@ -1605,6 +1711,7 @@ Atualize os imports nos routers. Verifique que tudo continua funcionando.
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class PratoInput(BaseModel):
     nome: str = Field(min_length=3, max_length=100)
     categoria: str = Field(pattern="^(pizza|massa|sobremesa|entrada|salada)$")
@@ -1612,6 +1719,7 @@ class PratoInput(BaseModel):
     preco_promocional: Optional[float] = Field(default=None, gt=0)
     descricao: Optional[str] = Field(default=None, max_length=500)
     disponivel: bool = True
+
 
 class PratoOutput(BaseModel):
     id: int
@@ -1622,6 +1730,7 @@ class PratoOutput(BaseModel):
     descricao: Optional[str]
     disponivel: bool
     criado_em: str
+
 
 # Os demais arquivos (bebida.py, pedido.py, reserva.py)
 # seguem a mesma estrutura, com os modelos de cada domínio.
@@ -1644,6 +1753,7 @@ pip install pydantic-settings
 # config.py
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     app_name: str = "Bella Tavola API"
     app_version: str = "1.0.0"
@@ -1653,6 +1763,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+
 
 settings = Settings()
 
@@ -1666,10 +1777,7 @@ settings = Settings()
 # main.py — usando settings
 from config import settings
 
-app = FastAPI(
-    title=settings.app_name,
-    version=settings.app_version
-)
+app = FastAPI(title=settings.app_name, version=settings.app_version)
 
 """**Sua tarefa:**  
 Crie o arquivo `config.py` com as configurações acima.
@@ -1690,6 +1798,7 @@ Verifique que alterar o `.env` muda o comportamento sem alterar o código.
 # config.py
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     app_name: str = "Bella Tavola API"
     app_version: str = "1.0.0"
@@ -1701,6 +1810,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
+
 settings = Settings()
 
 
@@ -1708,10 +1818,12 @@ settings = Settings()
 from pydantic import BaseModel, Field
 from config import settings
 
+
 class ReservaInput(BaseModel):
     mesa: int = Field(ge=1, le=settings.max_mesas)
     nome: str = Field(min_length=2, max_length=100)
     pessoas: int = Field(ge=1, le=settings.max_pessoas_por_mesa)
+
 
 """### Exercício 3.6 — Desafio final: reservas antecipadas 🏆
 
@@ -1758,6 +1870,7 @@ from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
 
+
 class ReservaInput(BaseModel):
     mesa: int = Field(ge=1, le=20)
     nome: str = Field(min_length=2, max_length=100)
@@ -1772,6 +1885,7 @@ class ReservaInput(BaseModel):
             raise ValueError("Reserva deve ser feita com pelo menos 1 hora de antecedência")
         return v
 
+
 class ReservaOutput(BaseModel):
     id: int
     mesa: int
@@ -1781,6 +1895,7 @@ class ReservaOutput(BaseModel):
     ativa: bool
     criada_em: str
 
+
 # routers/reservas.py
 from fastapi import APIRouter, HTTPException
 from models.reserva import ReservaInput, ReservaOutput
@@ -1789,6 +1904,7 @@ from typing import Optional
 
 router = APIRouter()
 reservas = []
+
 
 @router.post("/", response_model=ReservaOutput)
 async def criar_reserva(reserva: ReservaInput):
@@ -1801,8 +1917,7 @@ async def criar_reserva(reserva: ReservaInput):
     )
     if conflito:
         raise HTTPException(
-            status_code=400,
-            detail=f"Mesa {reserva.mesa} já está reservada para {data_reserva}"
+            status_code=400, detail=f"Mesa {reserva.mesa} já está reservada para {data_reserva}"
         )
     nova = {
         "id": len(reservas) + 1,
@@ -1811,10 +1926,11 @@ async def criar_reserva(reserva: ReservaInput):
         "pessoas": reserva.pessoas,
         "data_hora": reserva.data_hora.isoformat(),
         "ativa": True,
-        "criada_em": datetime.now().isoformat()
+        "criada_em": datetime.now().isoformat(),
     }
     reservas.append(nova)
     return nova
+
 
 @router.get("/")
 async def listar_reservas(data: Optional[str] = None, apenas_ativas: bool = True):
@@ -1823,14 +1939,17 @@ async def listar_reservas(data: Optional[str] = None, apenas_ativas: bool = True
         resultado = [r for r in resultado if r["ativa"]]
     if data:
         resultado = [
-            r for r in resultado
+            r
+            for r in resultado
             if datetime.fromisoformat(r["data_hora"]).date().isoformat() == data
         ]
     return resultado
 
+
 @router.get("/mesa/{numero}")
 async def reservas_por_mesa(numero: int):
     return [r for r in reservas if r["mesa"] == numero]
+
 
 @router.get("/{reserva_id}", response_model=ReservaOutput)
 async def buscar_reserva(reserva_id: int):
@@ -1838,6 +1957,7 @@ async def buscar_reserva(reserva_id: int):
         if r["id"] == reserva_id:
             return r
     raise HTTPException(status_code=404, detail="Reserva não encontrada")
+
 
 @router.delete("/{reserva_id}")
 async def cancelar_reserva(reserva_id: int):
@@ -1848,6 +1968,7 @@ async def cancelar_reserva(reserva_id: int):
             r["ativa"] = False
             return {"mensagem": "Reserva cancelada com sucesso"}
     raise HTTPException(status_code=404, detail="Reserva não encontrada")
+
 
 """# Mapa da API Construída
 

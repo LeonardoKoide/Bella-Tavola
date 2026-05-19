@@ -49,7 +49,7 @@ Antes de começar, confirme que você já tem:
 """
 
 # Execute esta célula para instalar os pacotes necessários
-!pip install scikit-learn joblib pandas numpy huggingface_hub fastapi uvicorn
+#!pip install scikit-learn joblib pandas numpy huggingface_hub fastapi uvicorn
 
 """### Token do Hugging Face
 
@@ -160,7 +160,7 @@ X, y = make_classification(
     n_redundant=1,
     class_sep=1.0,
     weights=[0.7, 0.3],
-    random_state=42
+    random_state=42,
 )
 
 df = pd.DataFrame(X, columns=[f"feature_{i}" for i in range(X.shape[1])])
@@ -246,29 +246,31 @@ Features nomeadas tornam o problema mais compreensível desde o início.
 import numpy as np
 import pandas as pd
 
+
 def gerar_churn(n_samples: int = 1000, seed: int = 42) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
 
     churn = rng.integers(0, 2, size=n_samples)
 
-    dias_sem_login    = np.where(churn, rng.integers(30, 180, n_samples),
-                                        rng.integers(1, 30, n_samples))
-    num_chamados      = np.where(churn, rng.integers(3, 15, n_samples),
-                                        rng.integers(0, 4, n_samples))
+    dias_sem_login = np.where(
+        churn, rng.integers(30, 180, n_samples), rng.integers(1, 30, n_samples)
+    )
+    num_chamados = np.where(churn, rng.integers(3, 15, n_samples), rng.integers(0, 4, n_samples))
     valor_mensalidade = rng.uniform(50, 500, n_samples).round(2)
-    meses_contrato    = np.where(churn, rng.integers(1, 12, n_samples),
-                                        rng.integers(6, 60, n_samples))
-    nps_score         = np.where(churn, rng.integers(0, 6, n_samples),
-                                        rng.integers(5, 11, n_samples))
+    meses_contrato = np.where(churn, rng.integers(1, 12, n_samples), rng.integers(6, 60, n_samples))
+    nps_score = np.where(churn, rng.integers(0, 6, n_samples), rng.integers(5, 11, n_samples))
 
-    return pd.DataFrame({
-        "dias_sem_login":    dias_sem_login,
-        "num_chamados":      num_chamados,
-        "valor_mensalidade": valor_mensalidade,
-        "meses_contrato":    meses_contrato,
-        "nps_score":         nps_score,
-        "churn":             churn
-    })
+    return pd.DataFrame(
+        {
+            "dias_sem_login": dias_sem_login,
+            "num_chamados": num_chamados,
+            "valor_mensalidade": valor_mensalidade,
+            "meses_contrato": meses_contrato,
+            "nps_score": nps_score,
+            "churn": churn,
+        }
+    )
+
 
 df = gerar_churn(n_samples=2000, seed=42)
 print(df.describe())
@@ -614,8 +616,9 @@ print("Modelo salvo em model.pkl")
 model_carregado = joblib.load("model.pkl")
 
 import numpy as np
+
 amostra = X_test[:5]
-pred_original  = model.predict(amostra)
+pred_original = model.predict(amostra)
 pred_carregado = model_carregado.predict(amostra)
 
 assert np.array_equal(pred_original, pred_carregado), "Predições divergem!"
@@ -745,10 +748,7 @@ login(token="hf_seu_token_aqui")
 api = HfApi()
 
 repo_url = api.create_repo(
-    repo_id="seu-usuario/fraud-detector-v1",
-    repo_type="model",
-    exist_ok=True,
-    private=False
+    repo_id="seu-usuario/fraud-detector-v1", repo_type="model", exist_ok=True, private=False
 )
 print(f"Repositório: {repo_url}")
 
@@ -923,7 +923,7 @@ for filename in ["model.pkl", "README.md", "requirements.txt"]:
         path_in_repo=filename,
         repo_id=repo_id,
         repo_type="model",
-        commit_message=f"Add {filename}"
+        commit_message=f"Add {filename}",
     )
     print(f"✅ {filename} publicado")
 
@@ -1043,20 +1043,14 @@ O padrão correto é:
 from huggingface_hub import hf_hub_download
 import joblib
 
-def load_model(
-    repo_id: str,
-    filename: str = "model.pkl",
-    force_download: bool = False
-):
-    local_path = hf_hub_download(
-        repo_id=repo_id,
-        filename=filename,
-        force_download=force_download
-    )
+
+def load_model(repo_id: str, filename: str = "model.pkl", force_download: bool = False):
+    local_path = hf_hub_download(repo_id=repo_id, filename=filename, force_download=force_download)
     model = joblib.load(local_path)
     origem = "Hub (forçado)" if force_download else "cache local"
     print(f"✅ Modelo carregado de: {origem} ({local_path})")
     return model
+
 
 """### Sua tarefa
 
@@ -1146,10 +1140,12 @@ router = APIRouter()
 REPO_ID = "seu-usuario/mlops-fraud-v1"
 _model = None
 
+
 def get_model():
     global _model
     if _model is None:
         from model_utils import load_model
+
         _model = load_model(REPO_ID)
     return _model
 
@@ -1173,24 +1169,26 @@ class PredictOutput(BaseModel):
 async def predict(input: PredictInput):
     model = get_model()
 
-    features = np.array([[
-        input.valor_transacao,
-        input.hora_transacao,
-        input.distancia_ultima_compra,
-        input.tentativas_senha,
-        input.pais_diferente
-    ]])
+    features = np.array(
+        [
+            [
+                input.valor_transacao,
+                input.hora_transacao,
+                input.distancia_ultima_compra,
+                input.tentativas_senha,
+                input.pais_diferente,
+            ]
+        ]
+    )
 
     prediction = int(model.predict(features)[0])
     probability = float(model.predict_proba(features)[0][1])
     label = "fraude" if prediction == 1 else "legítimo"
 
     return PredictOutput(
-        prediction=prediction,
-        probability=round(probability, 4),
-        label=label,
-        model_version=REPO_ID
+        prediction=prediction, probability=round(probability, 4), label=label, model_version=REPO_ID
     )
+
 
 """### Sua tarefa
 
@@ -1260,6 +1258,7 @@ Para uma API de ML, o health check precisa informar se o modelo está de fato ca
 ### Referência
 """
 
+
 @router.get("/health")
 async def health():
     try:
@@ -1272,11 +1271,8 @@ async def health():
         model_status = "degraded"
         model_info = str(e)
 
-    return {
-        "api": "ok",
-        "model": model_status,
-        "model_repo": model_info
-    }
+    return {"api": "ok", "model": model_status, "model_repo": model_info}
+
 
 """### Sua tarefa
 

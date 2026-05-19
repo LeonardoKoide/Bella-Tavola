@@ -6,6 +6,7 @@ from typing import Optional
 router = APIRouter()
 reservas = []
 
+
 @router.post("/", response_model=ReservaOutput)
 async def criar_reserva(reserva: ReservaInput):
     data_reserva = reserva.data_hora.date()
@@ -17,8 +18,7 @@ async def criar_reserva(reserva: ReservaInput):
     )
     if conflito:
         raise HTTPException(
-            status_code=400,
-            detail=f"Mesa {reserva.mesa} já está reservada para {data_reserva}"
+            status_code=400, detail=f"Mesa {reserva.mesa} já está reservada para {data_reserva}"
         )
     nova = {
         "id": len(reservas) + 1,
@@ -27,10 +27,11 @@ async def criar_reserva(reserva: ReservaInput):
         "pessoas": reserva.pessoas,
         "data_hora": reserva.data_hora.isoformat(),
         "ativa": True,
-        "criada_em": datetime.now().isoformat()
+        "criada_em": datetime.now().isoformat(),
     }
     reservas.append(nova)
     return nova
+
 
 @router.get("/")
 async def listar_reservas(data: Optional[str] = None, apenas_ativas: bool = True):
@@ -39,14 +40,17 @@ async def listar_reservas(data: Optional[str] = None, apenas_ativas: bool = True
         resultado = [r for r in resultado if r["ativa"]]
     if data:
         resultado = [
-            r for r in resultado
+            r
+            for r in resultado
             if datetime.fromisoformat(r["data_hora"]).date().isoformat() == data
         ]
     return resultado
 
+
 @router.get("/mesa/{numero}")
 async def reservas_por_mesa(numero: int):
     return [r for r in reservas if r["mesa"] == numero]
+
 
 @router.get("/{reserva_id}", response_model=ReservaOutput)
 async def buscar_reserva(reserva_id: int):
@@ -54,6 +58,7 @@ async def buscar_reserva(reserva_id: int):
         if r["id"] == reserva_id:
             return r
     raise HTTPException(status_code=404, detail="Reserva não encontrada")
+
 
 @router.delete("/{reserva_id}")
 async def cancelar_reserva(reserva_id: int):
