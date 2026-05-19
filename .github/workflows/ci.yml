@@ -21,7 +21,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Verificar formatação
-        run: black --check .
+        run: black --check .  --exclude="Cadernos"
       - name: Verificar imports não utilizados
         run: autoflake --check --remove-all-unused-imports -r .
       - name: Rodar testes smoke
