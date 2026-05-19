@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from src.routers import pratos, bebidas, pedidos, reservas
+from routers import pratos, bebidas, pedidos, reservas
 
 app = FastAPI(
     title="Bella Tavola API", description="API do restaurante Bella Tavola", version="1.0.0"
