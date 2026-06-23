@@ -3,6 +3,8 @@ __pycache__
 *.pyo
 *.pyd
 .Python
+Apresentações
+Cadernos
 env/
 venv/
 .env
