@@ -140,5 +140,6 @@ ml/*.joblib
 *.joblib
 model_fraude.pkl
 
-
-Apresentações
+# Notebooks e apresentações (não versionam)
+Cadernos/
+Apresentações/
