@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models.reserva import ReservaInput, ReservaOutput
+from ..models.reserva import ReservaInput, ReservaOutput
 from datetime import datetime
 from typing import Optional
 
