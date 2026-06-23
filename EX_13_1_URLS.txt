@@ -1,0 +1,142 @@
+════════════════════════════════════════════════════════════════════════════════
+  EXERCÍCIO 13.1 — URLs E CHECKLIST RÁPIDO
+════════════════════════════════════════════════════════════════════════════════
+
+SEU PERFIL GIT:
+  User: LeonadoKoide
+  Email: leofkoide@outlook.com
+  Repositório: https://github.com/LeonadoKoide/bella-tavola
+
+════════════════════════════════════════════════════════════════════════════════
+PASSO 1: DOCKER HUB
+════════════════════════════════════════════════════════════════════════════════
+
+1A. Se já tem conta:
+    URL: https://hub.docker.com/
+    Ação: Login e copie seu USERNAME
+
+1B. Se NÃO tem conta:
+    URL: https://hub.docker.com/signup
+    Ação: Crie conta → confirme email → login
+
+Username do Docker Hub: ___________________________
+(Preencha após criar/confirmar conta)
+
+════════════════════════════════════════════════════════════════════════════════
+PASSO 2: REPOSITÓRIO NO DOCKER HUB
+════════════════════════════════════════════════════════════════════════════════
+
+URL para criar: https://hub.docker.com/repositories/create
+
+Dados:
+  Name: bella-tavola
+  Visibility: Public
+
+Após criar:
+  URL do repositório: https://hub.docker.com/r/SEU-USERNAME/bella-tavola
+
+[ ] Repositório criado
+
+════════════════════════════════════════════════════════════════════════════════
+PASSO 3: TOKEN DE ACESSO (CRÍTICO: USE TOKEN, NÃO SENHA!)
+════════════════════════════════════════════════════════════════════════════════
+
+URL: https://hub.docker.com/settings/security
+
+Ações:
+  1. Clique em "New Access Token"
+  2. Token name: bella-tavola-ci
+  3. Permissions: ✓ Read & Write
+  4. Clique "Generate"
+  5. COPIE O TOKEN (aparece só 1x!)
+
+Token: ___________________________
+(Cole após gerar - aparece só UMA VEZ!)
+
+[ ] Token gerado e copiado
+
+════════════════════════════════════════════════════════════════════════════════
+PASSO 4: DOCKER LOGIN LOCAL
+════════════════════════════════════════════════════════════════════════════════
+
+Terminal:
+  $ docker login
+  Username: (cole SEU-USERNAME)
+  Password: (cole o TOKEN que você gerou, não sua senha)
+
+Resultado esperado:
+  Login Succeeded
+
+[ ] docker login passou
+
+════════════════════════════════════════════════════════════════════════════════
+PASSO 5: GITHUB SECRETS
+════════════════════════════════════════════════════════════════════════════════
+
+URL Manual:
+  https://github.com/LeonadoKoide/bella-tavola/settings/secrets/actions
+
+Secrets a adicionar:
+  Nome: DOCKER_USERNAME
+  Valor: (seu username do Docker Hub)
+
+  Nome: DOCKER_PASSWORD
+  Valor: (o token que você gerou)
+
+Ou via CLI:
+  $ gh secret set DOCKER_USERNAME --body "seu-username"
+  $ gh secret set DOCKER_PASSWORD --body "seu-token"
+
+Verificar:
+  $ gh secret list
+
+[ ] DOCKER_USERNAME configurado
+[ ] DOCKER_PASSWORD configurado
+
+════════════════════════════════════════════════════════════════════════════════
+CHECKLIST FINAL
+════════════════════════════════════════════════════════════════════════════════
+
+Antes de prosseguir para Exercício 13.2, confirme:
+
+[ ] Conta Docker Hub criada/confirmada
+[ ] Repositório bella-tavola criado (PUBLIC)
+[ ] Token gerado (Read & Write)
+[ ] docker login funcionou
+[ ] Secret DOCKER_USERNAME no GitHub
+[ ] Secret DOCKER_PASSWORD no GitHub
+[ ] gh secret list mostra os secrets
+
+════════════════════════════════════════════════════════════════════════════════
+PRÓXIMO PASSO: EXERCÍCIO 13.2
+════════════════════════════════════════════════════════════════════════════════
+
+Quando TODOS os checkboxes estiverem marcados:
+
+$ docker build -t seu-username/bella-tavola:v1 .
+$ docker push seu-username/bella-tavola:v1
+
+Verificar:
+  https://hub.docker.com/r/seu-username/bella-tavola/tags
+
+════════════════════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+════════════════════════════════════════════════════════════════════════════════
+
+❌ "denied: requested access to the resource is denied"
+   → Token inválido ou expirado
+   → Gere novo token em: https://hub.docker.com/settings/security
+
+❌ "name unknown: Repository not found"
+   → Repositório não existe no Docker Hub
+   → Crie em: https://hub.docker.com/repositories/create
+
+❌ "unauthorized: authentication required"
+   → Token revogado
+   → Gere novo com Read & Write
+
+❌ Secrets não aparecem em `gh secret list`
+   → Pode estar em outro branch
+   → Verifique: git branch
+
+════════════════════════════════════════════════════════════════════════════════
