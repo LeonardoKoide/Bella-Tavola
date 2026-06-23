@@ -1,15 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-import sys
-import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-from main import app
+# Import from src package directly (main.py uses relative imports)
+from src.main import app
 
 
 @pytest.fixture
