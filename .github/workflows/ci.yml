@@ -51,3 +51,45 @@ jobs:
         run: pytest tests/ -m integracao -v --tb=short
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: integracao
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Autenticar no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build e push da imagem
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/bella-tavola:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/bella-tavola:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  relatorio:
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resumo do pipeline
+        run: |
+          echo "================================================"
+          echo "  Pipeline CI do Bella Tavola concluído ✅"
+          echo "================================================"
+          echo "  Branch:  ${{ github.ref_name }}"
+          echo "  Commit:  ${{ github.sha }}"
+          echo "  Autor:   ${{ github.actor }}"
+          echo "  Imagem:  ${{ secrets.DOCKER_USERNAME }}/bella-tavola:${{ github.sha }}"
+          echo "================================================"
